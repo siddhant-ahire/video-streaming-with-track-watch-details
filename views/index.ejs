@@ -1,0 +1,45 @@
+<!-- views/index.ejs -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video Player</title>
+</head>
+<body>
+    <video id="videoPlayer" controls>
+        <source src="<%= videoSource %>" type="video/mp4">
+        Your browser does not support the video tag.
+    </video>
+    <script>
+    const video = document.getElementById('videoPlayer');
+    video.currentTime = 5000;
+    let timeoutId;
+
+    const trackVideo = () => {
+        const watchedTime = Math.floor(video.currentTime);
+        fetch('/track', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                userId: 'guestUser',
+                videoId: '<%= videoId %>',
+                watchedTime: watchedTime
+            })
+        });
+    };
+
+    video.addEventListener('pause', () => {
+        // Track when the video is paused
+        trackVideo();
+    });
+
+    window.addEventListener('beforeunload', () => {
+        // Track when the user exits the page or closes the browser
+        trackVideo();
+    });
+    </script>
+</body>
+</html>
